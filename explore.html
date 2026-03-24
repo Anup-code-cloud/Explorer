@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Heritage Explorer — World Cultural Sites</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --sand: #F5EDD6;
+    --sand-dark: #E8D9B5;
+    --ink: #1A120A;
+    --ink-soft: #3D2B1A;
+    --ink-muted: #7A6351;
+    --gold: #B8862A;
+    --gold-light: #E8C46A;
+    --terracotta: #B84B2A;
+    --teal: #1A6B6B;
+    --teal-light: #2A9494;
+    --paper: #FBF6ED;
+    --white: #FFFFFF;
+    --border: rgba(90,60,30,0.15);
+    --border-strong: rgba(90,60,30,0.3);
+    --shadow-card: 0 2px 16px rgba(26,18,10,0.08);
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'Lato', sans-serif;
+    --radius: 12px;
+    --radius-sm: 6px;
+    --transition: 0.22s ease;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--ink);
+    color: var(--sand);
+    padding: 0 2rem;
+  }
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    gap: 1rem;
+  }
+  .logo {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    color: var(--sand);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-mark {
+    width: 28px; height: 28px;
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: var(--gold);
+    font-family: var(--font-display);
+    font-style: italic;
+    flex-shrink: 0;
+  }
+  .header-stats {
+    display: flex; gap: 1.5rem;
+  }
+  .hstat {
+    text-align: center;
+    font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ink-muted);
+    line-height: 1.2;
+  }
+  .hstat strong {
+    display: block; font-family: var(--font-display); font-size: 1.1rem;
+    color: var(--gold-light); font-weight: 400;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--ink);
+    color: var(--sand);
+    padding: 3rem 2rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(
+      0deg, transparent, transparent 39px, rgba(184,134,42,0.06) 40px
+    ), repeating-linear-gradient(
+      90deg, transparent, transparent 39px, rgba(184,134,42,0.06) 40px
+    );
+    pointer-events: none;
+  }
+  .hero-inner {
+    max-width: 1200px; margin: 0 auto;
+    position: relative; z-index: 1;
+  }
+  .hero-eyebrow {
+    font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 1rem;
+  }
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    line-height: 1.1; font-weight: 400;
+    max-width: 700px; margin-bottom: 1.2rem;
+  }
+  .hero h1 em { color: var(--gold-light); font-style: italic; }
+  .hero-sub {
+    font-size: 1rem; color: var(--ink-muted); max-width: 560px;
+    line-height: 1.7; margin-bottom: 2rem;
+    color: rgba(245,237,214,0.65);
+  }
+
+  /* ── SEARCH & FILTER BAR ── */
+  .controls {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .controls-inner {
+    max-width: 1200px; margin: 0 auto;
+    padding: 0.9rem 2rem;
+    display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;
+  }
+  .search-wrap {
+    position: relative; flex: 1; min-width: 200px;
+  }
+  .search-wrap svg {
+    position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+    color: var(--ink-muted); pointer-events: none;
+  }
+  #search {
+    width: 100%; padding: 0.55rem 1rem 0.55rem 2.4rem;
+    border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+    font-family: var(--font-body); font-size: 0.88rem; background: var(--paper);
+    color: var(--ink); outline: none; transition: border-color var(--transition);
+  }
+  #search:focus { border-color: var(--gold); }
+  .filters {
+    display: flex; gap: 0.4rem; flex-wrap: wrap;
+  }
+  .filter-btn {
+    padding: 0.4rem 0.9rem; border-radius: 100px;
+    border: 1px solid var(--border-strong); background: transparent;
+    font-family: var(--font-body); font-size: 0.78rem; cursor: pointer;
+    color: var(--ink-muted); transition: all var(--transition); white-space: nowrap;
+  }
+  .filter-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .filter-btn.active {
+    background: var(--ink); color: var(--sand);
+    border-color: var(--ink);
+  }
+  .sort-select {
+    padding: 0.4rem 0.9rem; border-radius: var(--radius-sm);
+    border: 1px solid var(--border-strong); background: var(--paper);
+    font-family: var(--font-body); font-size: 0.78rem; cursor: pointer;
+    color: var(--ink); outline: none;
+  }
+
+  /* ── MAIN ── */
+  main {
+    max-width: 1200px; margin: 0 auto; padding: 2rem;
+  }
+  .results-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  .results-count {
+    font-size: 0.8rem; color: var(--ink-muted); letter-spacing: 0.05em;
+  }
+  .results-count strong { color: var(--ink); }
+
+  /* ── GRID ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+    animation: fadeUp 0.4s ease both;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card);
+    border-color: var(--gold);
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .card-thumb {
+    width: 100%; height: 180px;
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 4rem;
+  }
+  .card-thumb-bg {
+    position: absolute; inset: 0;
+  }
+  .card-thumb-emoji {
+    position: relative; z-index: 1;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.35));
+  }
+  .card-region-badge {
+    position: absolute; top: 10px; right: 10px; z-index: 2;
+    padding: 0.2rem 0.6rem; border-radius: 100px;
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .card-body { padding: 1.1rem 1.25rem 1.25rem; }
+  .card-country {
+    font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 0.3rem;
+  }
+  .card-name {
+    font-family: var(--font-display); font-size: 1.12rem; line-height: 1.3;
+    color: var(--ink); margin-bottom: 0.5rem;
+  }
+  .card-desc {
+    font-size: 0.82rem; line-height: 1.6; color: var(--ink-muted);
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 0.9rem;
+  }
+  .card-meta {
+    display: flex; gap: 1rem; align-items: center;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+  }
+  .meta-pill {
+    font-size: 0.68rem; padding: 0.2rem 0.6rem; border-radius: 100px;
+    background: var(--sand); color: var(--ink-soft); border: 1px solid var(--border);
+    font-weight: 700; letter-spacing: 0.05em;
+  }
+  .card-year {
+    font-size: 0.75rem; color: var(--ink-muted); margin-left: auto;
+    font-style: italic;
+  }
+
+  /* ── EMPTY STATE ── */
+  .empty {
+    grid-column: 1 / -1;
+    text-align: center; padding: 4rem 2rem;
+    color: var(--ink-muted);
+  }
+  .empty h3 { font-family: var(--font-display); font-size: 1.4rem; margin-bottom: 0.5rem; color: var(--ink-soft); }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(26,18,10,0.7);
+    display: flex; align-items: center; justify-content: center;
+    padding: 2rem;
+    opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--white); border-radius: 16px;
+    width: 100%; max-width: 680px; max-height: 90vh;
+    overflow-y: auto;
+    transform: translateY(24px) scale(0.97);
+    transition: transform 0.25s ease;
+  }
+  .modal-overlay.open .modal { transform: translateY(0) scale(1); }
+  .modal-hero {
+    height: 200px; width: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 6rem; position: relative; overflow: hidden;
+    border-radius: 16px 16px 0 0;
+  }
+  .modal-close {
+    position: absolute; top: 12px; right: 12px; z-index: 5;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(0,0,0,0.45); border: none; color: #fff;
+    cursor: pointer; font-size: 1rem; display: flex;
+    align-items: center; justify-content: center; line-height: 1;
+  }
+  .modal-body { padding: 1.75rem 2rem 2rem; }
+  .modal-eyebrow {
+    display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .modal-country-badge {
+    font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--gold); font-weight: 700;
+  }
+  .modal-title {
+    font-family: var(--font-display); font-size: 1.75rem; line-height: 1.2;
+    margin-bottom: 1rem; color: var(--ink);
+  }
+  .modal-desc {
+    font-size: 0.93rem; line-height: 1.75; color: var(--ink-soft);
+    margin-bottom: 1.5rem;
+  }
+  .modal-facts {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 0.75rem; margin-bottom: 1.5rem;
+  }
+  .fact-box {
+    background: var(--paper); border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem; border: 1px solid var(--border);
+  }
+  .fact-label { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 0.2rem; }
+  .fact-value { font-family: var(--font-display); font-size: 1rem; color: var(--ink); }
+  .modal-why {
+    border-left: 3px solid var(--gold); padding-left: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .modal-why h4 { font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.4rem; }
+  .modal-why p { font-size: 0.88rem; line-height: 1.7; color: var(--ink-soft); }
+  .modal-tips h4 {
+    font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--teal); margin-bottom: 0.6rem;
+  }
+  .tip-item {
+    display: flex; gap: 0.6rem; align-items: flex-start;
+    font-size: 0.85rem; color: var(--ink-soft); line-height: 1.55;
+    margin-bottom: 0.4rem;
+  }
+  .tip-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--teal-light); flex-shrink: 0; margin-top: 0.45em;
+  }
+
+  /* REGION COLORS */
+  .region-asia      { background: #2A1A5E; color: #BEB0F5; }
+  .region-europe    { background: #0D4A6B; color: #A0D4F0; }
+  .region-africa    { background: #5E2A0A; color: #F5C49A; }
+  .region-americas  { background: #0D5E2A; color: #A0F0C0; }
+  .region-oceania   { background: #0D4A5E; color: #A0E0F0; }
+  .region-mideast   { background: #5E4A0A; color: #F0D88A; }
+
+  .thumb-asia      { background: linear-gradient(135deg, #1A0F3D 0%, #2D1B69 100%); }
+  .thumb-europe    { background: linear-gradient(135deg, #062033 0%, #0A3A5E 100%); }
+  .thumb-africa    { background: linear-gradient(135deg, #3D1505 0%, #6B2A0A 100%); }
+  .thumb-americas  { background: linear-gradient(135deg, #062B15 0%, #0A5E2A 100%); }
+  .thumb-oceania   { background: linear-gradient(135deg, #062033 0%, #0A4A5E 100%); }
+  .thumb-mideast   { background: linear-gradient(135deg, #2E1E00 0%, #5C3D00 100%); }
+
+  @media (max-width: 640px) {
+    header, .hero { padding-left: 1rem; padding-right: 1rem; }
+    .controls-inner, main { padding-left: 1rem; padding-right: 1rem; }
+    .modal { max-width: 100%; margin: 0; border-radius: 16px 16px 0 0; align-self: flex-end; }
+    .modal-overlay { align-items: flex-end; padding: 0; }
+    .modal-facts { grid-template-columns: 1fr; }
+    .header-stats { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-mark">H</div>
+      Heritage Explorer
+    </div>
+    <div class="header-stats">
+      <div class="hstat"><strong>1,199</strong>Total Sites</div>
+      <div class="hstat"><strong>168</strong>Countries</div>
+      <div class="hstat"><strong>900+</strong>Cultural</div>
+    </div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <p class="hero-eyebrow">✦ UNESCO World Heritage Sites</p>
+    <h1>Discover the <em>Wonders</em> Humanity Left Behind</h1>
+    <p class="hero-sub">Journey through 10,000 years of civilization — ancient temples, forgotten cities, sacred landscapes, and the masterworks of human ingenuity.</p>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="controls-inner">
+    <div class="search-wrap">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="search" type="text" placeholder="Search sites, countries, regions…" />
+    </div>
+    <div class="filters">
+      <button class="filter-btn active" data-region="all">All Regions</button>
+      <button class="filter-btn" data-region="asia">Asia</button>
+      <button class="filter-btn" data-region="europe">Europe</button>
+      <button class="filter-btn" data-region="africa">Africa</button>
+      <button class="filter-btn" data-region="americas">Americas</button>
+      <button class="filter-btn" data-region="mideast">Middle East</button>
+      <button class="filter-btn" data-region="oceania">Oceania</button>
+    </div>
+    <select class="sort-select" id="sort">
+      <option value="name">Sort: Name</option>
+      <option value="year">Sort: Year</option>
+      <option value="country">Sort: Country</option>
+    </select>
+  </div>
+</div>
+
+<main>
+  <div class="results-bar">
+    <p class="results-count">Showing <strong id="count">0</strong> sites</p>
+  </div>
+  <div class="grid" id="grid"></div>
+</main>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal">
+    <div class="modal-hero" id="modal-hero">
+      <button class="modal-close" id="modal-close">✕</button>
+      <span id="modal-emoji" style="position:relative;z-index:1;filter:drop-shadow(0 6px 16px rgba(0,0,0,0.4))"></span>
+    </div>
+    <div class="modal-body">
+      <div class="modal-eyebrow">
+        <span class="modal-country-badge" id="modal-country"></span>
+        <span class="meta-pill" id="modal-type"></span>
+        <span class="meta-pill" id="modal-region-badge"></span>
+      </div>
+      <h2 class="modal-title" id="modal-title"></h2>
+      <p class="modal-desc" id="modal-desc"></p>
+      <div class="modal-facts" id="modal-facts"></div>
+      <div class="modal-why">
+        <h4>Why it matters</h4>
+        <p id="modal-why"></p>
+      </div>
+      <div class="modal-tips">
+        <h4>✦ Visitor Tips</h4>
+        <div id="modal-tips"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SITES = [
+  {
+    id:1, name:"Taj Mahal", country:"India", region:"asia",
+    year:1983, type:"Monument", emoji:"🕌",
+    desc:"An ivory-white marble mausoleum on the south bank of the Yamuna river, built by Mughal emperor Shah Jahan in memory of his beloved wife Mumtaz Mahal.",
+    why:"A perfect fusion of Persian, Islamic, and Indian architectural styles, the Taj Mahal stands as the world's greatest monument to love and is considered the jewel of Muslim art in India.",
+    facts:{Inscribed:"1983","Built":"1632–1653",City:"Agra","Visitors/yr":"7–8 million"},
+    tips:["Visit at sunrise for the most magical light and fewest crowds.","Hire a certified guide at the entrance — the stories behind the calligraphy are extraordinary.","Full moon nights offer ticketed after-dark visits worth booking in advance."]
+  },
+  {
+    id:2, name:"Great Wall of China", country:"China", region:"asia",
+    year:1987, type:"Fortification", emoji:"🏯",
+    desc:"A series of walls and fortifications stretching across the historical northern borders of ancient Chinese states, built to protect against nomadic invasions.",
+    why:"The Great Wall is a symbol of Chinese civilization's resilience and ambition, spanning over 13,000 miles and representing centuries of collective human labor across multiple dynasties.",
+    facts:{Inscribed:"1987","Total Length":"21,196 km",Dynasty:"Various","Best Section":"Mutianyu"},
+    tips:["Avoid the heavily restored Badaling section — Jinshanling or Jiankou offer stunning, less-crowded views.","Go on weekdays; weekends are extremely crowded in summer.","Wear layers — it's significantly colder on the wall than in Beijing."]
+  },
+  {
+    id:3, name:"Acropolis of Athens", country:"Greece", region:"europe",
+    year:1987, type:"Ancient City", emoji:"🏛️",
+    desc:"The ancient citadel of Athens perched on a rocky outcrop, containing the remains of several ancient buildings of great architectural and historic significance, including the Parthenon.",
+    why:"The Acropolis epitomizes the cultural flowering of Classical Greece and its ideals of democracy, philosophy, and artistic achievement that laid the foundations of Western civilization.",
+    facts:{Inscribed:"1987","Period":"5th century BC",City:"Athens","Height":"156 m above sea level"},
+    tips:["Arrive at opening time (8am) to experience the Parthenon before the crowds arrive.","The Acropolis Museum at the base rivals the hilltop itself — don't skip it.","Wear non-slip, flat shoes — the marble steps are deceptively slippery."]
+  },
+  {
+    id:4, name:"Machu Picchu", country:"Peru", region:"americas",
+    year:1983, type:"Ancient Citadel", emoji:"🏔️",
+    desc:"A 15th-century Inca citadel set high in the Andes Mountains of Peru, above the Sacred Valley, featuring extraordinary dry-stone wall construction and breathtaking mountain scenery.",
+    why:"Machu Picchu represents the pinnacle of Inca urban planning and engineering, mysteriously abandoned and rediscovered in 1911, offering an unparalleled window into the Inca Empire.",
+    facts:{Inscribed:"1983","Elevation":"2,430 m",Built:"c. 1450","Rediscovered":"1911 by Bingham"},
+    tips:["Book entry tickets months in advance — there's a strict daily visitor limit.","Take the train from Cusco to Aguas Calientes, then bus up to the site.","Sunrise from the Sun Gate (Inti Punku) after the Inca Trail is unforgettable."]
+  },
+  {
+    id:5, name:"Colosseum", country:"Italy", region:"europe",
+    year:1980, type:"Amphitheatre", emoji:"🏟️",
+    desc:"An oval amphitheatre in the centre of Rome, the largest ever built in the Roman Empire, capable of seating up to 80,000 spectators for gladiatorial contests and public spectacles.",
+    why:"The Colosseum is the enduring icon of Imperial Rome's power and ambition, and the prototype for every stadium built in the 2,000 years since — its elliptical design was revolutionary.",
+    facts:{Inscribed:"1980","Capacity":"50,000–80,000",Completed:"80 AD","Height":"48–52 m"},
+    tips:["Book the underground hypogeum tour for a spine-tingling look at where gladiators prepared for battle.","Combo ticket with the Roman Forum and Palatine Hill offers excellent value.","Visit on weekday mornings; the area around the Colosseum is perpetually busy."]
+  },
+  {
+    id:6, name:"Angkor Wat", country:"Cambodia", region:"asia",
+    year:1992, type:"Temple Complex", emoji:"⛩️",
+    desc:"The world's largest religious monument, Angkor Wat was built in the 12th century as a Hindu temple and later converted to Buddhism, representing the peak of Khmer architectural achievement.",
+    why:"Angkor Wat's extraordinary bas-reliefs and towers symbolize Mount Meru, home of the gods in Hindu cosmology. Its scale and intricate ornamentation remain unmatched in Southeast Asian history.",
+    facts:{Inscribed:"1992","Area":"402 acres",Built:"12th century","Religion":"Hindu → Buddhist"},
+    tips:["Watch sunrise over the reflecting pool — one of the most iconic sights on earth.","The full Angkor park is vast; hire a tuk-tuk driver for multi-day exploration.","Ta Prohm, where tree roots engulf the ruins, is the most atmospheric temple."]
+  },
+  {
+    id:7, name:"Petra", country:"Jordan", region:"mideast",
+    year:1985, type:"Ancient City", emoji:"🪨",
+    desc:"A famous archaeological city in Jordan known for its rock-cut architecture and water conduit system. Half-built, half-carved into the rose-red cliffs of southern Jordan — the 'Rose City'.",
+    why:"Petra was the capital of the Nabataean Kingdom and a crossroads of ancient trade. Its sophisticated hydraulic engineering allowed a city of 30,000 to flourish in the desert.",
+    facts:{Inscribed:"1985","Period":"4th century BC",Country:"Jordan","Key Site":"The Treasury (Al-Khazneh)"},
+    tips:["Walk the full Siq gorge approach — the slow reveal of The Treasury is one of travel's greatest moments.","Petra by Night on Monday/Wednesday/Thursday evenings is ethereally beautiful.","Wear comfortable walking shoes — the full site involves 12+ km of walking."]
+  },
+  {
+    id:8, name:"Great Pyramid of Giza", country:"Egypt", region:"africa",
+    year:1979, type:"Ancient Monument", emoji:"🔺",
+    desc:"The oldest and largest of the three pyramids in the Giza complex, built as a tomb for Pharaoh Khufu around 2560 BC. The only surviving wonder of the ancient world.",
+    why:"The Great Pyramid held the record as the tallest man-made structure in the world for 3,800 years. Its precision engineering and massive scale remain a subject of wonder and debate.",
+    facts:{Inscribed:"1979","Height":"138.8 m",Built:"c. 2560 BC","Blocks":"2.3 million stone blocks"},
+    tips:["The site opens at 8am — arrive early before tour groups.","Solar Boat Museum on-site houses a 4,600-year-old intact funerary boat.","Opt for the less-visited Khafre pyramid interior for a more intimate experience."]
+  },
+  {
+    id:9, name:"Stonehenge", country:"United Kingdom", region:"europe",
+    year:1986, type:"Prehistoric Monument", emoji:"🪨",
+    desc:"A prehistoric monument on Salisbury Plain in Wiltshire, England, consisting of a ring of standing stones each around 13 feet high, seven feet wide and weighing around 25 tons.",
+    why:"Stonehenge remains one of the world's greatest mysteries — built over 1,500 years starting around 3000 BC, its precise astronomical alignments suggest sophisticated Neolithic knowledge.",
+    facts:{Inscribed:"1986","Period":"3000–1500 BC",Location:"Wiltshire, England","Stone weight":"Up to 25 tons"},
+    tips:["Book the 'Stone Circle Experience' for after-hours inner circle access.","Visit during the Summer Solstice (June 21) for the extraordinary public gathering.","Avebury stone circle nearby is less famous but far more immersive — you walk among the stones."]
+  },
+  {
+    id:10, name:"Historic Centre of Rome", country:"Italy", region:"europe",
+    year:1980, type:"Historic District", emoji:"🏺",
+    desc:"The cradle of Western civilization and Christian culture, Rome's historic centre contains a concentration of monuments spanning over 2,700 years of continuous urban history.",
+    why:"No city on Earth contains more layers of civilizational history per square mile. From the Forum Romanum to the Vatican, Rome is simultaneously a living city and an open-air museum.",
+    facts:{Inscribed:"1980","Period":"753 BC–present",Population:"2.8 million","Key Sites":"40+ major monuments"},
+    tips:["Get a Roma Pass for unlimited metro/bus travel and free museum entry.","Walk rather than taking transport — Rome's distances are deceptively manageable.","Avoid August — the city empties of locals but floods with tourists."]
+  },
+  {
+    id:11, name:"Serengeti National Park", country:"Tanzania", region:"africa",
+    year:1981, type:"Natural & Cultural", emoji:"🦁",
+    desc:"An ecosystem encompassing approximately 30,000 km² of savanna in northern Tanzania, home to the world's largest terrestrial mammal migration and extraordinary biodiversity.",
+    why:"The Serengeti's annual migration of 1.5 million wildebeest is one of the last great wildlife spectacles on Earth, representing an unbroken natural cycle that has continued for millions of years.",
+    facts:{Inscribed:"1981","Area":"14,763 km²",Country:"Tanzania","Migration":"1.5 million wildebeest"},
+    tips:["July to October is peak migration season in the northern Mara corridor.","A hot air balloon safari at dawn over the plains is worth every penny.","Stay in a tented camp within the park for the most authentic experience."]
+  },
+  {
+    id:12, name:"Alhambra, Generalife & Albayzín", country:"Spain", region:"europe",
+    year:1984, type:"Palace & Gardens", emoji:"🌙",
+    desc:"A palace and fortress complex in Granada, Andalusia, Spain — the last great monument of Moorish rule in Europe, combining Nasrid palaces, military architecture, and exquisite gardens.",
+    why:"The Alhambra represents the pinnacle of Moorish art and architecture in Europe. Its intricate stucco carvings, mosaic tilework, and mathematically perfect geometry have influenced art worldwide.",
+    facts:{Inscribed:"1984","Dynasty":"Nasrid (1238–1492)",City:"Granada, Spain","Gardens":"Generalife palace gardens"},
+    tips:["Book tickets months ahead — entry is strictly timed and sells out fast.","The Nasrid Palaces are the highlight; ensure your timed slot starts before midday.","View the Alhambra at dusk from the Mirador de San Nicolás in the Albayzín quarter."]
+  },
+  {
+    id:13, name:"Historic City of Kyoto", country:"Japan", region:"asia",
+    year:1994, type:"Historic City", emoji:"⛩️",
+    desc:"Japan's imperial capital for over a thousand years, Kyoto preserves 17 UNESCO-listed sites including temples, shrines, palaces, and gardens representing the zenith of Japanese culture.",
+    why:"Kyoto is the custodian of Japan's cultural soul — its wood-built architecture, tea ceremony tradition, Noh theatre, and Zen gardens shaped what the world recognizes as distinctly Japanese.",
+    facts:{Inscribed:"1994","Period":"794–1869 AD",Sites:"17 monuments","Best known":"Kinkaku-ji, Fushimi Inari"},
+    tips:["Visit Fushimi Inari Shrine at dawn or dusk when the thousands of torii gates glow.","The bamboo grove at Arashiyama is magical in the early morning before tour groups arrive.","Rent a bicycle to explore the Philosopher's Path and eastern temple district."]
+  },
+  {
+    id:14, name:"Chichén Itzá", country:"Mexico", region:"americas",
+    year:1988, type:"Ancient City", emoji:"🔺",
+    desc:"A pre-Columbian city built by the Maya civilization on the Yucatán Peninsula, featuring the stepped pyramid of El Castillo, a wonder of ancient astronomical engineering.",
+    why:"El Castillo's 365 steps (one per day of the year) and the shadow-serpent phenomenon during equinoxes demonstrate the Maya's extraordinary astronomical knowledge and architectural precision.",
+    facts:{Inscribed:"1988","Period":"600–1200 AD",Country:"Mexico","New 7 Wonders":"Yes (2007)"},
+    tips:["Arrive at the very start of opening time (8am) before buses arrive from Cancún.","The spring equinox shadow-serpent phenomenon (March 20) draws massive crowds — book ahead.","Swim in the nearby cenote Ik Kil for a refreshing, eerily beautiful experience."]
+  },
+  {
+    id:15, name:"Great Barrier Reef", country:"Australia", region:"oceania",
+    year:1981, type:"Natural World Wonder", emoji:"🐠",
+    desc:"The world's largest coral reef system, composed of over 2,900 individual reefs and 900 islands stretching over 2,300 kilometres off Queensland, Australia.",
+    why:"The Great Barrier Reef is the world's most extensive coral reef ecosystem, visible from outer space, and home to an extraordinary diversity of marine life found nowhere else on Earth.",
+    facts:{Inscribed:"1981","Length":"2,300 km","Species":"1,500 fish, 4,000 mollusc",State:"Under climate threat"},
+    tips:["Cairns and Port Douglas are the best base towns for reef access.","Liveaboard dive trips give access to the Coral Sea's most pristine, remote sections.","Even snorkelers see spectacular life — you don't need to be a certified diver."]
+  },
+  {
+    id:16, name:"Versailles Palace & Gardens", country:"France", region:"europe",
+    year:1979, type:"Palace", emoji:"👑",
+    desc:"The royal château of Versailles served as the official residence of French kings from 1682 until the Revolution of 1789, epitomizing absolute monarchy through architectural magnificence.",
+    why:"Versailles set the standard for royal palaces across Europe and defined French classical style. Its Hall of Mirrors and formal gardens were deliberate political instruments of royal power.",
+    facts:{Inscribed:"1979","Built":"1661–1710",City:"Versailles, France","Rooms":"2,300 rooms"},
+    tips:["Buy the Passport ticket for access to all gardens, fountains, and the Trianon palaces.","Visit on Tuesday or Thursday for the spectacular Musical Fountains Show.","Arrive at 9am to see the Hall of Mirrors before tour groups make photography impossible."]
+  },
+  {
+    id:17, name:"Medina of Marrakech", country:"Morocco", region:"africa",
+    year:1985, type:"Historic Medina", emoji:"🕌",
+    desc:"The ancient walled city at the heart of Marrakech, a labyrinthine maze of souks, mosques, madrasas, palaces, and riads that has continuously shaped and reshaped Moroccan culture.",
+    why:"The Medina of Marrakech is a living, breathing testament to medieval Islamic urban planning, its Djemaa el-Fna square serving as the world's largest living cultural heritage space.",
+    facts:{Inscribed:"1985","Founded":"1062 AD",Country:"Morocco","Key site":"Djemaa el-Fna square"},
+    tips:["Hire a local guide to navigate the medina — even GPS fails in the maze of alleys.","Djemaa el-Fna transforms dramatically from a market by day to storytelling carnival by night.","Visit the Saadian Tombs early morning — they're exquisitely preserved and rarely crowded."]
+  },
+  {
+    id:18, name:"Borobudur Temple Compounds", country:"Indonesia", region:"asia",
+    year:1991, type:"Temple Complex", emoji:"🏯",
+    desc:"A 9th-century Mahayana Buddhist temple in Magelang, Central Java, Indonesia — the world's largest Buddhist temple and one of the greatest Buddhist monuments in the world.",
+    why:"Borobudur's 2,672 bas-relief panels tell the complete story of the path to enlightenment in stone, making it the world's most elaborate religious narrative carved in architecture.",
+    facts:{Inscribed:"1991","Built":"9th century AD",Country:"Indonesia","Stupas":"504 Buddha statues"},
+    tips:["Sunrise visits (book the special Manohara sunrise ticket) are transcendent as mist rises from the jungle.","Combine with Prambanan Hindu temples for a remarkable contrast of faiths in one day.","The monument is purely for walking — wear light, comfortable clothes."]
+  }
+];
+
+let activeRegion = 'all';
+let searchTerm = '';
+let sortBy = 'name';
+
+function getFilteredSites() {
+  let sites = [...SITES];
+  if (activeRegion !== 'all') sites = sites.filter(s => s.region === activeRegion);
+  if (searchTerm) {
+    const q = searchTerm.toLowerCase();
+    sites = sites.filter(s =>
+      s.name.toLowerCase().includes(q) ||
+      s.country.toLowerCase().includes(q) ||
+      s.type.toLowerCase().includes(q) ||
+      s.desc.toLowerCase().includes(q)
+    );
+  }
+  sites.sort((a,b) => {
+    if (sortBy === 'year') return a.year - b.year;
+    if (sortBy === 'country') return a.country.localeCompare(b.country);
+    return a.name.localeCompare(b.name);
+  });
+  return sites;
+}
+
+const REGION_LABELS = {
+  asia:'Asia', europe:'Europe', africa:'Africa',
+  americas:'Americas', oceania:'Oceania', mideast:'Middle East'
+};
+
+function renderGrid() {
+  const sites = getFilteredSites();
+  const grid = document.getElementById('grid');
+  document.getElementById('count').textContent = sites.length;
+  if (sites.length === 0) {
+    grid.innerHTML = `<div class="empty"><h3>No sites found</h3><p>Try adjusting your search or filter.</p></div>`;
+    return;
+  }
+  grid.innerHTML = sites.map((s, i) => `
+    <div class="card" data-id="${s.id}" style="animation-delay:${i * 40}ms">
+      <div class="card-thumb">
+        <div class="card-thumb-bg thumb-${s.region}"></div>
+        <span class="card-thumb-emoji" style="font-size:4rem">${s.emoji}</span>
+        <span class="card-region-badge region-${s.region}">${REGION_LABELS[s.region]}</span>
+      </div>
+      <div class="card-body">
+        <p class="card-country">${s.country}</p>
+        <h3 class="card-name">${s.name}</h3>
+        <p class="card-desc">${s.desc}</p>
+        <div class="card-meta">
+          <span class="meta-pill">${s.type}</span>
+          <span class="card-year">Est. ${Object.values(s.facts)[1]}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  grid.querySelectorAll('.card').forEach(c => c.addEventListener('click', () => openModal(+c.dataset.id)));
+}
+
+function openModal(id) {
+  const s = SITES.find(x => x.id === id);
+  const overlay = document.getElementById('modal-overlay');
+  document.getElementById('modal-hero').className = `modal-hero thumb-${s.region}`;
+  document.getElementById('modal-emoji').textContent = s.emoji;
+  document.getElementById('modal-country').textContent = `${s.country} · Inscribed ${s.year}`;
+  document.getElementById('modal-type').textContent = s.type;
+  document.getElementById('modal-region-badge').textContent = REGION_LABELS[s.region];
+  document.getElementById('modal-title').textContent = s.name;
+  document.getElementById('modal-desc').textContent = s.desc;
+  document.getElementById('modal-why').textContent = s.why;
+  document.getElementById('modal-facts').innerHTML = Object.entries(s.facts)
+    .map(([k,v]) => `<div class="fact-box"><p class="fact-label">${k}</p><p class="fact-value">${v}</p></div>`)
+    .join('');
+  document.getElementById('modal-tips').innerHTML = s.tips
+    .map(t => `<div class="tip-item"><div class="tip-dot"></div><span>${t}</span></div>`)
+    .join('');
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+document.getElementById('modal-close').addEventListener('click', closeModal);
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal();
+});
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+document.getElementById('search').addEventListener('input', e => {
+  searchTerm = e.target.value; renderGrid();
+});
+document.getElementById('sort').addEventListener('change', e => {
+  sortBy = e.target.value; renderGrid();
+});
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeRegion = btn.dataset.region;
+    renderGrid();
+  });
+});
+
+renderGrid();
+</script>
+</body>
+</html>
